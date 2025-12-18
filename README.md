@@ -1,0 +1,1 @@
+# generador-informe-scout
