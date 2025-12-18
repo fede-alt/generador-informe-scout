@@ -1,1 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador Informe Individual - RCL Scout</title>
+
+<style>
+*{box-sizing:border-box}
+:root{
+--primary:#0e2b4b;
+--secondary:#f4f6f8;
+--accent:#2c5282;
+--text:#333;
+}
+body{
+font-family:'Segoe UI',Roboto,Arial,sans-serif;
+background:var(--secondary);
+margin:0;
+padding:20px;
+color:var(--text);
+}
+.container{
+max-width:900px;
+margin:auto;
+background:#fff;
+padding:30px;
+border-radius:8px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+header{text-align:center;border-bottom:2px solid var(--primary);padding-bottom:15px;margin-bottom:20px}
+h1{margin:0;color:var(--primary)}
+.form-section{margin-bottom:25px;border:1px solid #eee;padding:20px;border-radius:8px}
+.form-section h3{margin-top:0;color:var(--primary)}
+.row{display:flex;gap:20px;flex-wrap:wrap}
+.col{flex:1;min-width:250px}
+label{font-weight:bold;font-size:.85em;margin-bottom:4px;display:block}
+input,select,textarea{
+width:100%;
+padding:10px;
+border:1px solid #ccc;
+border-radius:4px;
+font-family:inherit
+}
+textarea{resize:vertical}
+.btn{
+width:100%;
+margin-top:20px;
+padding:15px;
+font-size:1.1em;
+background:#28a745;
+color:#fff;
+border:none;
+border-radius:5px;
+cursor:pointer
+}
+.print-only{display:none}
+@media print{
+.no-print{display:none}
+.print-only{display:block}
+body{background:#fff;padding:0}
+.container{box-shadow:none}
+}
+.player-card{
+display:flex;
+gap:20px;
+background:#f0f7ff;
+padding:15px;
+border-radius:8px;
+margin-bottom:15px
+}
+.player-img{
+width:110px;height:110px;border-radius:50%;object-fit:cover
+}
+.player-info{
+flex:1;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:6px 20px;
+font-size:.9em
+}
+.info-item{display:flex;justify-content:space-between}
+.info-label{font-weight:bold;color:var(--accent)}
+.context-bar{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px;
+font-size:.85em;
+margin-bottom:15px
+}
+.conc-label{
+font-weight:bold;
+color:var(--primary);
+margin-bottom:4px;
+display:block
+}
+.zone-text{text-align:justify;font-size:.9em}
+img.report-img{
+width:100%;
+border:1px solid #ccc;
+border-radius:6px
+}
+</style>
+</head>
+
+<body>
+
+<div class="container no-print" id="editor">
+<header>
+<h1>Generador Informe Individual</h1>
+<p>RCL Scout Group</p>
+<label>Logo</label>
+<input type="file" id="inp_logo" accept="image/*">
+</header>
+
+<div class="form-section">
+<h3>Perfil del Jugador</h3>
+<div class="row">
+<div class="col">
+<label>Nombre</label><input id="inp_name">
+<label>Edad</label><input id="inp_age">
+<label>Posición</label><input id="inp_pos">
+<label>Club</label><input id="inp_club">
+<label>Foto</label><input type="file" id="inp_photo" accept="image/*">
+</div>
+<div class="col">
+<label>Valoración</label><input id="inp_rating">
+<label>Potencial</label><input id="inp_potential">
+<label>Recomendación</label>
+<select id="inp_rec">
+<option>Seguimiento</option>
+<option>Fichar Prioritario</option>
+<option>Fichar Opción B</option>
+<option>Descartar</option>
+</select>
+<label>Agencia</label><input id="inp_agency">
+<label>Fin Contrato</label><input id="inp_contract">
+</div>
+</div>
+</div>
+
+<div class="form-section">
+<h3>Contexto del Partido</h3>
+<div class="row">
+<div class="col">
+<label>Fecha</label><input type="date" id="inp_date">
+<label>Equipo Local</label><input id="inp_home">
+<label>Equipo Visitante</label><input id="inp_away">
+<label>Resultado</label><input id="inp_score">
+</div>
+<div class="col">
+<label>Competición</label><input id="inp_comp">
+<label>Estadio</label><input id="inp_loc">
+<label>Scout</label><input id="inp_scout">
+</div>
+</div>
+</div>
+
+<div class="form-section">
+<h3>Análisis Integral del Jugador</h3>
+
+<label>Mapa de Calor</label>
+<input type="file" id="inp_heatmap" accept="image/*">
+
+<label style="margin-top:10px">Mapa de Ocupación Posicional</label>
+<input type="file" id="inp_positionmap" accept="image/*">
+
+<label style="margin-top:10px">Perfil Técnico</label>
+<textarea id="inp_tech" rows="4"></textarea>
+
+<label>Perfil Táctico</label>
+<textarea id="inp_tact" rows="4"></textarea>
+
+<label>Perfil Físico</label>
+<textarea id="inp_phys" rows="4"></textarea>
+
+<label>Perfil Psicológico</label>
+<textarea id="inp_psych" rows="4"></textarea>
+</div>
+
+<div class="form-section">
+<h3>Conclusiones</h3>
+<label>Fortalezas</label><textarea id="inp_str" rows="4"></textarea>
+<label>Debilidades</label><textarea id="inp_weak" rows="4"></textarea>
+<label>Resumen General</label><textarea id="inp_sum" rows="5"></textarea>
+</div>
+
+<button class="btn" onclick="generate()">Generar Informe</button>
+</div>
+
+<div class="container print-only" id="report">
+<header>
+<h1>INFORME INDIVIDUAL</h1>
+<img id="out_logo" style="height:60px">
+</header>
+
+<div class="player-card">
+<img id="out_photo" class="player-img">
+<div class="player-info">
+<div class="info-item"><span class="info-label">Nombre</span><span id="out_name"></span></div>
+<div class="info-item"><span class="info-label">Valoración</span><span id="out_rating"></span></div>
+<div class="info-item"><span class="info-label">Edad</span><span id="out_age"></span></div>
+<div class="info-item"><span class="info-label">Potencial</span><span id="out_potential"></span></div>
+<div class="info-item"><span class="info-label">Posición</span><span id="out_pos"></span></div>
+<div class="info-item"><span class="info-label">Recomendación</span><span id="out_rec"></span></div>
+<div class="info-item"><span class="info-label">Club</span><span id="out_club"></span></div>
+<div class="info-item"><span class="info-label">Contrato</span><span id="out_contract"></span></div>
+</div>
+</div>
+
+<div class="context-bar">
+<div><strong>Fecha:</strong> <span id="out_date"></span></div>
+<div><strong>Partido:</strong> <span id="out_match"></span></div>
+<div><strong>Resultado:</strong> <span id="out_score"></span></div>
+<div><strong>Competición:</strong> <span id="out_comp"></span></div>
+<div><strong>Estadio:</strong> <span id="out_loc"></span></div>
+<div><strong>Scout:</strong> <span id="out_scout"></span></div>
+</div>
+
+<h3>Mapas</h3>
+<img id="out_heatmap" class="report-img">
+<img id="out_positionmap" class="report-img">
+
+<h3>Perfiles</h3>
+<span class="conc-label">Perfil Técnico</span><div id="out_tech" class="zone-text"></div>
+<span class="conc-label">Perfil Táctico</span><div id="out_tact" class="zone-text"></div>
+<span class="conc-label">Perfil Físico</span><div id="out_phys" class="zone-text"></div>
+<span class="conc-label">Perfil Psicológico</span><div id="out_psych" class="zone-text"></div>
+
+<h3>Conclusiones</h3>
+<span class="conc-label">Fortalezas</span><div id="out_str" class="zone-text"></div>
+<span class="conc-label">Debilidades</span><div id="out_weak" class="zone-text"></div>
+<span class="conc-label">Resumen</span><div id="out_sum" class="zone-text"></div>
+
+<div class="no-print" style="margin-top:30px;text-align:center">
+<button onclick="window.print()" class="btn">Guardar PDF</button>
+<button onclick="edit()" class="btn" style="background:#777">Editar</button>
+</div>
+</div>
+
+<script>
+const images={}
+document.addEventListener('change',e=>{
+if(e.target.type==='file'){
+const r=new FileReader()
+r.onload=ev=>images[e.target.id]=ev.target.result
+r.readAsDataURL(e.target.files[0])
+}})
+function txt(i,o){document.getElementById(o).innerText=document.getElementById(i).value}
+function img(i,o){if(images[i]){document.getElementById(o).src=images[i]}}
+function generate(){
+document.getElementById('editor').style.display='none'
+document.getElementById('report').style.display='block'
+window.scrollTo(0,0)
+
+img('inp_logo','out_logo')
+img('inp_photo','out_photo')
+img('inp_heatmap','out_heatmap')
+img('inp_positionmap','out_positionmap')
+
+txt('inp_name','out_name')
+txt('inp_age','out_age')
+txt('inp_pos','out_pos')
+txt('inp_club','out_club')
+txt('inp_rating','out_rating')
+txt('inp_potential','out_potential')
+txt('inp_rec','out_rec')
+txt('inp_agency','out_agency')
+txt('inp_contract','out_contract')
+
+txt('inp_date','out_date')
+txt('inp_score','out_score')
+txt('inp_comp','out_comp')
+txt('inp_loc','out_loc')
+txt('inp_scout','out_scout')
+
+document.getElementById('out_match').innerText=
+document.getElementById('inp_home').value+" vs "+document.getElementById('inp_away').value
+
+txt('inp_tech','out_tech')
+txt('inp_tact','out_tact')
+txt('inp_phys','out_phys')
+txt('inp_psych','out_psych')
+txt('inp_str','out_str')
+txt('inp_weak','out_weak')
+txt('inp_sum','out_sum')
+}
+function edit(){
+document.getElementById('report').style.display='none'
+document.getElementById('editor').style.display='block'
+window.scrollTo(0,0)
+}
+</script>
+
+</body>
+</html>
 
